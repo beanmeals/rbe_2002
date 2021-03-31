@@ -12,7 +12,7 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/Users/beanmeals/Desktop/School Work/RBE 2002/Lab 1/rbe2002-sample-codes-main/week01/ultrasonic/.pio/build/a-star32U4/firmware.elf",
+            "executable": "/Users/beanmeals/Documents/GitHub/rbe_2002/rbe2002-sample-codes-main/week01/ultrasonic/.pio/build/a-star32U4/firmware.elf",
             "projectEnvName": "a-star32U4",
             "toolchainBinDir": "/Users/beanmeals/.platformio/packages/toolchain-atmelavr/bin",
             "internalConsoleOptions": "openOnSessionStart",
@@ -25,7 +25,7 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/Users/beanmeals/Desktop/School Work/RBE 2002/Lab 1/rbe2002-sample-codes-main/week01/ultrasonic/.pio/build/a-star32U4/firmware.elf",
+            "executable": "/Users/beanmeals/Documents/GitHub/rbe_2002/rbe2002-sample-codes-main/week01/ultrasonic/.pio/build/a-star32U4/firmware.elf",
             "projectEnvName": "a-star32U4",
             "toolchainBinDir": "/Users/beanmeals/.platformio/packages/toolchain-atmelavr/bin",
             "internalConsoleOptions": "openOnSessionStart"
