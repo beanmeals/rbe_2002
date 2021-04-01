@@ -13,10 +13,14 @@
  */
 
 #include <Arduino.h>
-
+float find_med();
+float rollingAvg();
+float USslope = 0.0172558087; // 1/57.9515
+float USintercept = 0.7771446813; // 45.0367/57.9515
 volatile uint16_t pulseStart = 0;
 volatile uint16_t pulseEnd = 0;
-
+float prevVal[5];
+int prevValPH = 0;
 //define the states for the echo capture
 enum PULSE_STATE {PLS_IDLE, PLS_WAITING_LOW, PLS_WAITING_HIGH, PLS_CAPTURED};
 
@@ -106,11 +110,15 @@ void loop()
     //EDIT THIS LINE: convert pulseLengthTimerCounts, which is in timer counts, to time, in us
     //You'll need the clock frequency and the pre-scaler to convert timer counts to time
     
-    uint32_t pulseLengthUS = pulseLengthTimerCounts*4; //pulse length in us is 4uS per tick of timer
-
-
+    uint32_t pulseLengthUS = pulseLengthTimerCounts*4; //pulse length in us 4uS per tick of timer
+    
     //EDIT THIS LINE AFTER YOU CALIBRATE THE SENSOR: put your formula in for converting us -> cm
-    float distancePulse = 0;    //distance in cm
+    float distancePulse = USslope*pulseLengthUS + USintercept;    //distance in cm
+    // Array that holds the last 5 sets of distances
+    prevVal[prevValPH] = distancePulse;
+    prevValPH = (prevValPH == 4)? 0 : prevValPH + 1;
+    float Average = rollingAvg();
+    float Median = find_med();
 
     Serial.print(millis());
     Serial.print('\t');
@@ -119,6 +127,10 @@ void loop()
     Serial.print(pulseLengthUS);
     Serial.print('\t');
     Serial.print(distancePulse);
+    Serial.print('\t');
+    Serial.print(Average);
+    Serial.print('\t');
+    Serial.print(Median);
     Serial.print('\n');
   }
 }
@@ -143,4 +155,73 @@ ISR(TIMER3_CAPT_vect)
     pulseEnd = ICR3;
     pulseState = PLS_CAPTURED; //raise a flag to indicate that we have data
   }
+}
+
+float rollingAvg () {
+  float sumAvg = 0;
+  float avg;
+  
+  for (int i = 0; i < 5; i++) {
+    sumAvg = sumAvg + prevVal[i];
+  }
+  avg = sumAvg / 5;
+
+  return avg;
+}
+
+/*
+void swapNum(int *p, int *q) {
+  int t;
+  
+  t=*p;
+  *p=q;
+  *q=t;
+}
+
+void sortArray(int a[], int n) {
+  int i,j,temp;
+
+  for(i=0; i < n-1; i++) {
+    for (j=0, j < n-i-1; j++) {
+      if(a[j] > a[j+1])
+        swapNum(&a[j],&a[j+1]);
+    }
+  }
+}
+
+// float Median (float prevVal) {
+//   int a = prevVal;
+//   int n = 5;
+//   int sum, i;
+
+//   sortArray(a,n);
+
+//   n = (n+1) / 2 - 1;
+
+//   printf("Median Distance = %d ", a[n] );
+
+//   return 0;
+// }
+
+*/
+
+float min_val;
+int min_valInd;
+float find_med() {
+    min_val = prevVal[0];
+    for(int j = 0; j < 3; j++) {
+     min_val = prevVal[j];   
+    for(int i = j+1; i < 5; i++) {
+        if(min_val > prevVal[i]) {
+            min_valInd = i;
+            min_val = prevVal[i];
+        }
+    }
+    if(min_val != prevVal[j]) {
+        prevVal[min_valInd] = prevVal[j];
+        prevVal[j] = min_val;
+    }
+    
+    }
+    return min_val;
 }
